@@ -76,8 +76,8 @@ class PubMedClient(BaseIngestionClient):
       title=title,
       source=SourceType.PUBMED,
       url=url,
-      abstract=None,
-      published_at=None,
-      keywords=[],
-      doi=None,
+      # abstract=None,
+      # published_at=None,
+      # keywords=[],
+      # doi=None,
     )
