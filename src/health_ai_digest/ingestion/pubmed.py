@@ -76,6 +76,8 @@ class PubMedClient(BaseIngestionClient):
 
     authors = self._extract_authors(pubmed_article)
     published_at = self._extract_published_at(pubmed_article)
+    abstract = self._extract_abstract(pubmed_article)
+    doi = self._extract_doi(pubmed_article)
 
     return Article(
       title=title,
@@ -83,6 +85,8 @@ class PubMedClient(BaseIngestionClient):
       url=url,
       authors=authors,
       published_at=published_at,
+      abstract=abstract,
+      doi=doi,
     )
 
   def _extract_authors(self, pubmed_article: ET.Element) -> list[str]:
@@ -92,11 +96,14 @@ class PubMedClient(BaseIngestionClient):
     for author in pubmed_article.findall(".//Author"):
       fore_name = author.findtext("ForeName")
       last_name = author.findtext("LastName")
+      collective_name = author.findtext("CollectiveName")
 
       if fore_name and last_name:
         authors.append(f"{fore_name} {last_name}")
       elif last_name:
         authors.append(last_name)
+      elif collective_name:
+        authors.append(collective_name)
 
     return authors
 
@@ -141,3 +148,44 @@ class PubMedClient(BaseIngestionClient):
       return datetime(int(year), month_value, int(day))
     except ValueError:
       return None
+    
+  def _extract_abstract(self, pubmed_article: ET.Element) -> str | None:
+    # Extract abstract from PubMed XML. Supports both single and multi-section abstracts.
+    abstract_nodes = pubmed_article.findall(".//AbstractText")
+
+    if not abstract_nodes:
+      return None
+    
+    sections = []
+
+    for node in abstract_nodes:
+      text = "".join(node.itertext()).strip()
+
+      if not text:
+        continue
+
+      label = node.attrib.get("Label")
+
+      if label:
+        sections.append(f"{label}: {text}")
+      else:
+        sections.append(text)
+
+    if not sections:
+      return None
+    
+    return "\n\n".join(sections)
+  
+  def _extract_doi(self, pubmed_article: ET.Element) -> str | None:
+    # Extract Doi from PubMed XML
+    for article_id in pubmed_article.findall(".//ArticleId"):
+      if article_id.attrib.get("IdType") == "doi":
+        if article_id.text:
+          return article_id.text.strip()
+        
+    for elocation in pubmed_article.findall(".//ElocationID"):
+      if elocation.attrib.get("EIdType") == "doi":
+        if elocation.text:
+          return elocation.text.strip()
+        
+    return None
