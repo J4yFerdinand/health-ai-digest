@@ -10,14 +10,14 @@ def main():
 
   articles = aggregator.aggregate(
     query="artificial intelligence diagnosis",
-    limit=3,
+    limit=2,
   )
 
-  for article in articles:
-    print("=" * 80)
-    print(article.title)
-    print(article.source)
-    print(article.doi)
+  duplicated_articles = articles + articles
+  print("Before:", len(duplicated_articles))
+
+  deduplicated = aggregator.deduplicator.deduplicate(duplicated_articles)
+  print("After:", len(deduplicated))
 
 if __name__ == "__main__":
   main()
