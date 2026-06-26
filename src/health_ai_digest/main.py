@@ -1,36 +1,23 @@
 from health_ai_digest.ingestion.pubmed import PubMedClient
+from health_ai_digest.aggregation.aggregator import AggregationService
 
 def main():
-  client = PubMedClient()
+  pubmed = PubMedClient()
 
-  articles = client.fetch(
-    query="artificial intelligence diagnosis",
-    limit=3,
+  aggregator = AggregationService(
+    clients=[pubmed]
   )
 
-  for i, article in enumerate(articles, start=1):
-    print("=" * 100)
-    print(f"ARTICLE #{i}")
-    print("=" * 100)
+  articles = aggregator.aggregate(
+    query="artificial intelligence diagnosis",
+    limit=2,
+  )
 
-    print("TITLE:", article.title)
-    print("SOURCE:", article.source)
-    print("URL:", article.url)
-    print("AUTHORS:", article.authors)
-    print("PUBLISHED:", article.published_at)
-    print("DOI:", article.doi)
+  duplicated_articles = articles + articles
+  print("Before:", len(duplicated_articles))
 
-    if article.abstract:
-      preview = article.abstract[:500]
-      print("ABSTRACT:", preview)
-
-    if len(article.abstract) > 500:
-      print("... [TRUNCATED]")
-    else:
-      print("ABSTRACT: None")
-
-    print()
-
+  deduplicated = aggregator.deduplicator.deduplicate(duplicated_articles)
+  print("After:", len(deduplicated))
 
 if __name__ == "__main__":
   main()
