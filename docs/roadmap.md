@@ -8,9 +8,9 @@
 - [x] Manual testing
 
 ## Phase 2 — Aggregation Layer
-- [ ] Aggregator service
-- [ ] Multiple ingestion clients
-- [ ] Deduplication strategy
+- [x] Aggregator service
+- [x] Multiple ingestion clients
+- [x] Deduplication strategy
 
 ## Phase 3 — Ranking Engine
 - [ ] Relevance scoring

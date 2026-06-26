@@ -2,293 +2,417 @@
 
 ## 1. Overview
 
-`health-ai-digest` is a Python-based system designed to generate personalized newsletters focused on:
+`health-ai-digest` is a Python-based system designed to automatically collect, process, rank, and summarize the most relevant AI-related healthcare research articles.
 
-- Artificial Intelligence in healthcare
-- AI-assisted diagnosis
-- Patient monitoring and patient support
-- Emerging scientific research in health AI
+The goal of the project is to reduce information overload by transforming large volumes of medical research into concise, high-value digest focused on artificial intelligence in healthcare.
 
-The goal is to ingest scientific content from multiple trusted sources, process and rank that content by relevance, and generate concise digest summaries for fast consumption.
+The system is being built incrementally using a layered architecture that prioritizes modularity, testability, and extensibility.
 
 ---
+
 ## 2. Core Problem
 
-The health AI ecosystem evolves rapidly across:
+Healthcare AI research grows at a pace that makes manual tracking increasingly difficult.
 
-- Scientific papers
-- Medical journals
-- Research databases
-- Institutional publications
+Researchers, engineers, clinicians, and decision-makers face several challenges:
 
-Keeping up with relevant advances manually is time-consuming.
+- Too many papers published daily
+- Multiple data sources with overlapping content
+- Difficult manual filtering of relevant research
+- Limited time to read long technical papers
 
-This project solves that by automating:
+Health AI Digest addresses this problem by automating:
 
-1. Content ingestion
-2. Metadata extraction
-3. Relevance scoring
-4. Digest generation
+1. Article ingestion
+2. Multi-source aggregation
+3. Deduplication
+4. Relevance ranking
+5. Digest generation
 
 ---
+
 ## 3. High-Level Architecture
 
-Current target architecture:
+Health AI Digest follows a pipeline architecture.
 
 ```
-Sources
-├─ PubMed
-├─ arXiv
-├─ WHO
-├─ Nature
-└─ Other scientific sources
+External Sources
 		↓
 Ingestion Layer
 		↓
 Aggregation Layer
 		↓
-Ranking Engine
+Clean Article Collection
 		↓
-Digest Generator
+Ranking Layer
+		↓
+Digest Generator Layer
 		↓
 Newsletter Output
 ```
 
-Each layer has a clear responsibility and should remain loosely coupled.
+Each layer has a single responsibility and transforms data into a more refined form.
 
+### Current Pipeline State
+
+Implemented:
+
+```
+External Sources
+	↓
+Ingestion Layer
+	↓
+Aggregation Layer
+```
+
+Planned:
+
+```
+Ranking Layer
+	↓
+Digest Generation Layer
+```
 ---
+
 ## 4. Architectural Layers
+
 ### 4.1 Ingestion Layer
 
-Responsible for retrieving raw data from external sources.
+The Ingestion Layer is responsible for interacting with external article providers and converting source-specific responses into normalized internal objects.
 
 Responsibilities:
 
-- Connect to APIs/websites
-- Fetch raw content
-- Parse responses
-- Convert raw source data into internal domain objects
+- Query external APIs
+- Parse raw provider responses
+- Normalize metadata
+- Map data into `Article` objects
 
-Current implementations:
+Current sources:
+
+- PubMed
+
+Main components:
+
+- `BaseIngestionClient`
 - `PubMedClient`
 
-Future implementations:
- - `ArxivClient`
- - `WHOClient`
- - `NatureClient`
+Output:
+
+`list[Article]`
+
+Status
+
+✅ Implemented
 
 ---
+
 ### 4.2 Aggregation Layer
 
-Responsible for consolidating content from multiple sources.
+The Aggregation Layer combines results from multiple ingestion clients into a unified collection.
 
 Responsibilities:
 
-- Collect articles from all ingestion clients
-- Merge results
-- Normalize data
-- Deduplicate entries
+- Merge article collections from multiple sources
+- Remove duplicates
+- Prepare a clean article set for ranking
+
+Main components:
+
+- `AggregationService`
+- `Deduplicator`
+
+Current deduplication strategy:
+
+Priority order:
+
+1. DOI
+2. URL
+3. Normalize title
 
 Example:
 
-Multiple sources may reference the same paper. Aggregation ensures the system treats them as a single article.
+Two articles are considered duplicates if any of these identifiers match according to the priority strategy.
+
+Output:
+
+`list[Article]`
+
+Status:
+
+✅ Implement
 
 ---
+
 ### 4.3 Ranking Layer
 
-Responsible for scoring article relevance.
+The Ranking Layer will determine which articles are most relevant for the final digest.
 
-Potential ranking criteria:
+Responsibilities:
 
-- Topic relevance
+- Score articles
+- Prioritize high-value research
+- Sort by relevance
+
+Potential ranking signals:
+
 - Publication recency
-- Clinical impact
-- Novelty
-- Source credibility
+- AI relevance
+- Clinical relevance
+- Citation count
+- Journal reputation
 
-Example scoring formula:
+Possible output:
 
-```
-score = 
-	relevance * 0.40 +
-	recency * 0.30 +
-	credibility * 0.30
-```
+`list[Article]`
 
-This layer determines which articles deserve attention.
+Status:
+
+🔜 Planned (Phase 3)
 
 ---
+
 ### 4.4 Digest Generation Layer
 
-Responsible for transforming ranked articles into digest-friendly summaries.
+The Digest Generation Layer will transform ranked articles into readable summaries.
 
 Responsibilities:
 
 - Summarize papers
-- Highlight key findings
-- Generate human-readable output
+- Generate digest section
+- Export formatted digest
 
-Potential AI features:
+Potential output formats:
 
-- LLM summarization
-- Semantic clustering
-- Topic extraction
-- Trend detection
+- Markdown
+- HTML
+- Email newsletter
+- API Response
 
-Example digest output:
+Status:
 
-```
-Morning Health AI Digest
+🔜 Planned (Phase 4)
 
-1. New AI model improves early lung cancer detection.
-2. LLM-assisted triage reduces emergency wait times.
-3. Wearable AI improves atrial fibrillation screening.
-```
 ---
+
 ## 5. Current Project Structure
 
 ```
 health-ai-digest/
 |
 ├─ docs/
-|  └─ architecture.md
+|  ├─ decisions/
+|  |	├─ 001-src-layout.md
+|  |	├─ 002-pydantic-models.md
+|  |    ├─ 003-adapter-architecture.md
+|  |	└─ 004-pubmed-first-source.md
+|  ├─ architecture.md
+|  └─ roadmap.md
+|
 ├─ src/
 |	└─ health_ai_digest/
+|	|	├─ aggregation/
+|	|	|	├─ __init__.py
+|	|	|	├─ aggregator.py
+|	|	|	└─ deduplicator.py
+|	|	|
 |	|	├─ ingestion/
 |	|	|	├─ __init__.py
 |	|	|	├─ base.py
 |	|	|	└─ pubmed.py
+|	|	|
 |	|	├─ models/
 |	|	|	├─ __init__.py
 |	|	|	├─ article.py
 |	|	|	└─ enums.py
 |	|	|
-|	|	└─ main.py
-|	|	|
+|	| 	├─ __init__.py
+|	|	├─ main.py
+|   |	|
 |	|
 ├─ tests/
+|	├─ aggregation/
+|	|	├─ test_aggregator.py
+|	|	└─ test_deduplicator.py
+|	|
+|	├─ ingestion/
+|	|	└─ test_pubmed.py
+|	|
+|	├─ models/
+|	|	└─ test_article.py
+|	|
+|	├─ __init__.py
+|	├─ conftest.py
+|	|
 ├─ .gitignore
 ├─ pyproject.toml
 ├─ README.md
 ├─ requirements.txt	
 ```
+
 ---
+
 ## 6. Domain Model
 
 ### Article
 
-`Article` is the main domain entity shared across the system.
+`Article` is the core domain object and currently acts as the central aggregate root across all layers.
 
-Fields:
+Structure:
 
-- `title`
-- `source`
-- `url`
-- `abstract`
-- `authors`
-- `published_at`
-- `keywords`
-- `doi`
+```
+Article( 
+	title: str 
+	source: SourceType 
+	url: str 
+	abstract: str | None 
+	authors: list[str] 
+	published_at: datetime | None 
+	keywords: list[str] 
+	doi: str | None 
+)
+```
 
-All ingestion sources must normalize their outputs into this model.
+Responsibilities:
 
-This guarantees consistency across the pipeline.
+- Represent normalized research data
+- Decouple domain logic from source-specific formats
+- Serve as the shared contract between layers
+
+The `Article` model ensures all providers expose a consistent internal interface.
 
 ---
-## 7. Phase 1 Status (Completed)
 
-Phase 1 focused on building the ingestion foundation.
+## 7. Phase Status
 
-Completed components:
+### Phase 1 ─ Ingestion Foundation
 
-- Project structure
-- Python package setup
-- Pydantic domain models
+Status:
+
+✅ Completed
+
+Implmented:
+
+- Initial project structure
+- Article domain model
+- Source enum
 - Base ingestion abstraction
 - PubMed adapter
-- Manual smoke testing
-
-### PubMed Adapter Feature
-
-Implemented:
-
-- Search via PubMed E-utilities API
-- Metadata retrieval
 - XML parsing
-- Article normalization
+- Metadata normalization
 
-Parsed fields:
+Deliverable:
 
-- Title
-- Source
-- URL
-- Authors
-- Publication date
-- Abstract
-- DOI
+Fetch normalized healthcare AI research articles from PubMed.
 
-Current parsing pipeline:
-
-```
-Query
-  ↓
-PubMed Search API
-  ↓
-PMIDs
-  ↓
-PubMed Fetch API
-  ↓
-XML Response
-  ↓
-PubMed Parser
-  ↓
-Article objects
-```
 ---
-## 8. Design Principles
 
-This project follows several architectural principles:
+### Phase 2 ─ Aggregation Layer
+
+Status:
+
+✅ Completed
+
+Implmented:
+
+- AggregationService
+- Deduplicator
+- Multi-client aggregation
+- Duplicate detection heuristics
+- Unit tests
+- Shared pytest fixtures via `conftest.py`
+
+Deliverable:
+
+Merge multiple article streams into a clean deduplicated datatest.
+
+---
+
+### Phase 3 ─ Ranking Engine
+
+Status:
+
+🔜 Next
+
+Planned:
+
+- Scoring system
+- Relevance heuristics
+- Ranking algorithm
+- Sorting strategies
+
+Goal:
+
+Determine the most important articles.
+
+---
+
+### Phase 4 ─ Digest Generation
+
+Status:
+
+Planned
+
+Goal:
+
+Generate readable AI healthcare digests.
+
+---
+
+## 8. Design Principles
 
 ### Separation of Concerns
 
-Each component should have one responsibility.
+Each layer has one responsibility.
 
 Examples:
 
-- Networking
-- Parsing
-- Ranking
-- Summarization
-
-Should remain isolated.
+- Ingestion fetches data
+- Aggregation merges data
+- Ranking scores data
+- Digest formats output
 
 ---
+
 ### Extensibility
 
-New sources should be easy to add.
+The architecture supports easy addition of new sources.
 
-Example:
+Example future sources:
 
-Adding `ArxivClient` should require minimal changes to existing code.
+- arXiv
+- bioRxiv
+- Semantic Scholar
+
+New providers should integrate without changing existing domain logic.
 
 ---
+
 ### Strong Domain Modeling
 
-Internal data should always be represented by typed models.
+The system is built around explicit domain objects rather than raw dictionaries.
 
 Benefits:
 
-- Validation
-- Predictability
-- Easier debugging
+- Better validation
+- Stronger typing
+- Easier refactors
+- Clearer contracts
+
 ---
+
 ### Incremental Evolution
 
-Architecture will evolve phase by phase.
+The project evolves phase-by-phase.
 
-Avoid premature complexity.
+This allows:
+
+- Fast iteration
+- Continuous testing
+- Low-risk refactors
+- Better architecture decisions over time
 
 ---
+
 ## 9. Roadmap
 
 ### Phase 1 ─ Ingestion Foundation
@@ -299,9 +423,9 @@ Avoid premature complexity.
 
 ### Phase 2 ─ Aggregation Layer
 
-- [ ] Multi-source ingestion
-- [ ] Aggregation service
-- [ ] Deduplication logic
+- [x] Multi-source ingestion
+- [x] Aggregation service
+- [x] Deduplication logic
 
 ### Phase 3 ─ Ranking Engine 
 
@@ -313,21 +437,59 @@ Avoid premature complexity.
 - [ ] Summaries
 - [ ] Newsletter formatting
 - [ ] AI-assisted digest generation
+
 ---
+
 ## 10. Future Refactors
 
-Potential future refactor for PubMed module:
+Potential future improvements:
 
-```
-ingestion/pubmed/
-├─ client.py
-├─ parser.py
-├─ constants.py
-└─ exceptions.py
-```
+### Configuration Management
 
-This split may be useful as the PubMed adapter grows.
+Move environment/config settings into dedicated configuration objects.
 
-Not required yet.
+Example:
 
-Currente implementation remains intentionally simple.
+- API URLs
+- Timeouts
+- Limits
+- Ranking weights
+
+---
+
+### Logging and Observability
+
+Add structured logging and metrics.
+
+Examples:
+
+- Articles fetched
+- Duplicates removed
+- Ranking scores
+- Pipeline latency
+
+---
+
+### Multi-Source Expansion
+
+Add additional providers:
+
+- arXiv
+- bioRxiv
+- WHO
+
+---
+
+### Persistence Layer
+
+Potential storage options:
+
+- SQLite
+- PostgreSQL
+- Vector database
+
+Useful for:
+
+- Historical digests
+- Trend analysis
+- Search
