@@ -1,6 +1,5 @@
 from health_ai_digest.config.settings import settings
-from health_ai_digest.models.article import Article
-from health_ai_digest.models.ranked_article import RankedArticle
+from health_ai_digest.models import Article, RankedArticle
 from health_ai_digest.ranking.signals import SignalCalculator
 
 class ScoringEngine:
