@@ -3,16 +3,17 @@ import xml.etree.ElementTree as ET
 
 from datetime import datetime
 
+from health_ai_digest.config.settings import settings
 from health_ai_digest.ingestion.base import BaseIngestionClient
 from health_ai_digest.models.article import Article
 from health_ai_digest.models.enums import SourceType
 
 class PubMedClient(BaseIngestionClient):
-  SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
-  FETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
-  def fetch(self, query: str, limit: int = 10) -> list[Article]:
+  def fetch(self, query: str, limit: int | None = None) -> list[Article]:
     # Search PubMed and fetch full metadata for the resulting articles.
+    limit = limit or settings.pubmed_default_limit
+
     pmids = self._search(query, limit)
     xml_data = self._fetch_details(pmids)
     articles = self._parse_articles(xml_data)
@@ -28,7 +29,11 @@ class PubMedClient(BaseIngestionClient):
       "retmode": "json",
     }
 
-    response = requests.get(self.SEARCH_URL, params=params)
+    response = requests.get(
+      settings.pubmed_search_url,
+      params=params,
+      timeout=settings.pubmed_timeout,
+    )
     response.raise_for_status()
 
     data = response.json()
@@ -49,7 +54,11 @@ class PubMedClient(BaseIngestionClient):
       "retmode": "xml"
     }
 
-    response = requests.get(self.FETCH_URL, params=params)
+    response = requests.get(
+      settings.pubmed_search_url,
+      params=params,
+      timeout=settings.pubmed_timeout,
+    )
     response.raise_for_status()
 
     return response.text
