@@ -17,4 +17,9 @@ class Settings:
   ranking_recency_weight: float = 0.3
   ranking_quality_weight: float = 0.2
 
+  ranking_recency_threshold_fresh: int = 30
+  ranking_recency_threshold_recent: int = 90
+  ranking_recency_threshold_stale: int = 180
+  ranking_recency_threshold_old: int = 365
+
 settings = Settings()
