@@ -15,7 +15,9 @@ class PubMedClient(BaseIngestionClient):
     limit = limit or settings.pubmed_default_limit
 
     pmids = self._search(query, limit)
+
     xml_data = self._fetch_details(pmids)
+
     articles = self._parse_articles(xml_data)
 
     return articles
@@ -55,12 +57,12 @@ class PubMedClient(BaseIngestionClient):
     }
 
     response = requests.get(
-      settings.pubmed_search_url,
+      settings.pubmed_fetch_url,
       params=params,
       timeout=settings.pubmed_timeout,
     )
     response.raise_for_status()
-
+    
     return response.text
   
   def _parse_articles(self, xml_data: str) -> list[Article]:
