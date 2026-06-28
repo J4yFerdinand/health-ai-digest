@@ -6,7 +6,7 @@ from health_ai_digest.models import (
   RankedArticle,
   SourceType,
 )
-from health_ai_digest.ranking.ranker import Ranker
+from health_ai_digest.ranking import Ranker
 
 def create_article(title: str) -> Article:
   return Article(

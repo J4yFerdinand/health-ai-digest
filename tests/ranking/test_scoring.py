@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from health_ai_digest.config.settings import settings
 from health_ai_digest.models import Article, SourceType, RankedArticle
-from health_ai_digest.ranking.scoring import ScoringEngine
+from health_ai_digest.ranking import ScoringEngine
 
 def create_article() -> Article:
   return Article(

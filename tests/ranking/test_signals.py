@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 from health_ai_digest.models.article import Article
 from health_ai_digest.models.enums import SourceType
-from health_ai_digest.ranking.signals import SignalCalculator
+from health_ai_digest.ranking import SignalCalculator
 
 def create_article(days_old=None):
   published_at = None
