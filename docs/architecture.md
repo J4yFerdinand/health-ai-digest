@@ -44,6 +44,10 @@ Aggregation Layer
 		↓
 Clean Article Collection
 		↓
+Signal Calculator
+		↓
+Scoring Engine
+		↓
 Ranking Layer
 		↓
 Digest Generator Layer
@@ -63,6 +67,12 @@ External Sources
 Ingestion Layer
 	↓
 Aggregation Layer
+	↓
+Signal Calculation
+	↓
+Scoring Engine
+	↓
+Ranking Layer
 ```
 
 Planned:
@@ -145,29 +155,40 @@ Status:
 
 ### 4.3 Ranking Layer
 
-The Ranking Layer will determine which articles are most relevant for the final digest.
+The Ranking Layer determines which articles are most relevant for the final digest.
 
 Responsibilities:
 
-- Score articles
-- Prioritize high-value research
-- Sort by relevance
+- Compute ranking signal
+- Calculate weighted article scores
+- Sort articles by final score
 
-Potential ranking signals:
+Main components:
 
-- Publication recency
-- AI relevance
-- Clinical relevance
-- Citation count
-- Journal reputation
+- `SignalCalculator`
+- `ScoringEngine`
+- `Ranker`
 
-Possible output:
+```python
+final_score =
+(relevance_score * relevance_weight)
++ (recency_score * recency_weight)
++ (quality_score * quality_weight)
+```
 
-`list[Article]`
+Current ranking signals:
+
+- Publication recency ✅
+- AI relevance (placeholder)
+- Quality score (placeholder)
+
+Current output:
+
+`list[RankedArticle]`
 
 Status:
 
-🔜 Planned (Phase 3)
+✅ Implemented
 
 ---
 
@@ -203,48 +224,71 @@ health-ai-digest/
 |  ├─ decisions/
 |  |	├─ 001-src-layout.md
 |  |	├─ 002-pydantic-models.md
-|  |    ├─ 003-adapter-architecture.md
-|  |	└─ 004-pubmed-first-source.md
+|  |  ├─ 003-adapter-architecture.md
+|  |	├─ 004-pubmed-first-source.md
+|	 |	├─ 005-aggregation-layer.md
+|	 |	├─ 006-deduplication-stretegy.md
+|  |	├─ 007-ranking-architecture.md
+|	 |	└─ 008-weighted-scoring-engine.md
+|	 |
 |  ├─ architecture.md
 |  └─ roadmap.md
 |
 ├─ src/
 |	└─ health_ai_digest/
 |	|	├─ aggregation/
-|	|	|	├─ __init__.py
-|	|	|	├─ aggregator.py
-|	|	|	└─ deduplicator.py
+|	|	|		├─ __init__.py
+|	|	|		├─ aggregator.py
+|	|	|		└─ deduplicator.py
+|	|	|
+|	|	├─ config/
+| | |		├─ __init__.py
+| | |		└─ settings-py
 |	|	|
 |	|	├─ ingestion/
-|	|	|	├─ __init__.py
-|	|	|	├─ base.py
-|	|	|	└─ pubmed.py
+|	|	|		├─ __init__.py
+|	|	|		├─ base.py
+|	|	|		└─ pubmed.py
 |	|	|
 |	|	├─ models/
-|	|	|	├─ __init__.py
-|	|	|	├─ article.py
-|	|	|	└─ enums.py
+|	|	|		├─ __init__.py
+|	|	|		├─ article.py
+|	|	|		├─ enums.py
+|	|	|		└─ ranked_article.py
 |	|	|
-|	| 	├─ __init__.py
-|	|	├─ main.py
-|   |	|
+|	|	├─ ranking/
+| | |		├─ __init__.py
+|	|	|		├─ ranker.py
+|	|	|		├─ scoring.py
+|	|	|		└─ signals.py
+|	|	|
+|	| ├─ __init__.py
+|	|	└─ main.py
+| |	
 |	|
 ├─ tests/
 |	├─ aggregation/
-|	|	├─ test_aggregator.py
-|	|	└─ test_deduplicator.py
+|	|		├─ test_aggregator.py
+|	|		└─ test_deduplicator.py
 |	|
 |	├─ ingestion/
-|	|	└─ test_pubmed.py
+|	|		└─ test_pubmed.py
 |	|
 |	├─ models/
-|	|	└─ test_article.py
+|	|		├─ test_article.py
+|	|		└─ test_ranked_article.py
+|	|
+|	├─ ranking/
+|	|		├─ test_ranker.py
+|	|		├─ test_scoring.py
+|	|		└─ test_signals.py
 |	|
 |	├─ __init__.py
 |	├─ conftest.py
 |	|
 ├─ .gitignore
 ├─ pyproject.toml
+├─ pytest.ini
 ├─ README.md
 ├─ requirements.txt	
 ```
@@ -279,6 +323,32 @@ Responsibilities:
 - Serve as the shared contract between layers
 
 The `Article` model ensures all providers expose a consistent internal interface.
+
+---
+
+### RankedArticle
+
+`RankedArticle` extends `Article` with ranking metadata.
+
+Structure:
+
+```python
+RankedArticle(
+	article: Article,
+	score: float,
+	relevance_score: float = 0.0,
+	recency_score: float = 0.0,
+	quality_score: float = 0.0,
+)
+```
+
+Responsibilities:
+
+- Store ranking signals
+- Preserve scoring transparency
+- Provide ranked output for digest generation
+
+This model allows the system to explain why an article ranked highly.
 
 ---
 
@@ -331,18 +401,26 @@ Merge multiple article streams into a clean deduplicated datatest.
 
 Status:
 
-🔜 Next
+✅ Completed
 
-Planned:
+Implemented:
 
-- Scoring system
-- Relevance heuristics
-- Ranking algorithm
-- Sorting strategies
+- RankedArticle model
+- SignalCalculator
+- ScoringEngine
+- Weighted ranking formula
+- Ranker orchestration
+- Unit tests (9 passing)
 
-Goal:
+Current scorring signals:
 
-Determine the most important articles.
+- Recency score ✅
+- Relevance score (placeholder)
+- Quality score (placeholder)
+
+Deliverable:
+
+Rank articles according to weighted scoring signals.
 
 ---
 
@@ -429,8 +507,11 @@ This allows:
 
 ### Phase 3 ─ Ranking Engine 
 
+- [x] Scoring system
+- [x] Ranking orchestration
+- [x] Sorting strategies
 - [ ] Relevance scoring
-- [ ] Clinical priority scoring
+- [ ] Quality scoring
 
 ### Phase 4 ─ Digest Generation
 
@@ -444,16 +525,14 @@ This allows:
 
 Potential future improvements:
 
-### Configuration Management
+### Advance Ranking Signals
 
-Move environment/config settings into dedicated configuration objects.
+Future ranking improvements:
 
-Example:
-
-- API URLs
-- Timeouts
-- Limits
-- Ranking weights
+- Semantice relevance scoring
+- Clinical priority scoring
+- Citation-based quality scoring
+- Journal reputation scoring
 
 ---
 
