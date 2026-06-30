@@ -13,9 +13,11 @@
 - [x] Deduplication strategy
 
 ## Phase 3 — Ranking Engine
+- [x] Scoring system
+- [x] Ranking orchestration
+- [x] Sorting strategies
 - [ ] Relevance scoring
-- [ ] Topic scoring
-- [ ] Clinical importance scoring
+- [ ] Quality scoring
 
 ## Phase 4 — Digest Generation
 - [ ] Summarization

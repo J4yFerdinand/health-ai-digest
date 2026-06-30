@@ -1,23 +1,17 @@
 from health_ai_digest.ingestion.pubmed import PubMedClient
-from health_ai_digest.aggregation.aggregator import AggregationService
 
 def main():
-  pubmed = PubMedClient()
+  client = PubMedClient()
+  articles = client.fetch("artificial intelligence diagnosis", limit=3)
 
-  aggregator = AggregationService(
-    clients=[pubmed]
-  )
+  # print("Articles:", articles)
+  # print("Count:", len(articles))
 
-  articles = aggregator.aggregate(
-    query="artificial intelligence diagnosis",
-    limit=2,
-  )
-
-  duplicated_articles = articles + articles
-  print("Before:", len(duplicated_articles))
-
-  deduplicated = aggregator.deduplicator.deduplicate(duplicated_articles)
-  print("After:", len(deduplicated))
+  for article in articles:
+    print("=" * 80)
+    print(f"TITLE: {article.title}")
+    print(f"SOURCE: {article.source}")
+    print(f"URL: {article.url}")
 
 if __name__ == "__main__":
   main()

@@ -4,7 +4,11 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Environment variables
 .env
