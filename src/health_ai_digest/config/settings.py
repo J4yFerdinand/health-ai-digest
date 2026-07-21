@@ -22,4 +22,27 @@ class Settings:
   ranking_recency_threshold_stale: int = 180
   ranking_recency_threshold_old: int = 365
 
+  # LLM
+  llm_provider: str = "groq"
+  llm_timeout: int = 60
+  llm_max_retries: int = 3
+
+  # Groq
+  groq_model: str = "llama-3.3-70b-versatile"
+  groq_temperature: float = 0.2
+  groq_max_tokens: int = 700
+
+  # Digest
+  digest_max_articles: int = 10
+  digest_summary_max_chars: int = 1200
+  digest_key_takeaway_max_chars: int = 300
+
+  # # Export
+  # digest_output_dir: str = "outputs"
+  # digest_filename_prefix: str = "health_digest"
+
+  # # Project
+  # project_name: str = "health-ai-digest"
+  # project_version: str = "0.1.0"
+
 settings = Settings()

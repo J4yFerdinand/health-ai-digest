@@ -2,6 +2,7 @@ import pytest
 
 from datetime import datetime, UTC
 from collections.abc import Callable
+from typing import Any
 
 from health_ai_digest.models import (
   Article,
@@ -13,14 +14,20 @@ from health_ai_digest.models import (
 
 from health_ai_digest.digest import PromptBuilder
 
+DEFAULT_ARTICLE_TITLE = "Default Paper"
+DEFAULT_ARTICLE_URL = "https://default-paper"
+DEFAULT_ABSTRACT = "Default abstract."
+DEFAULT_SUMMARY = "Default summary."
+DEFAULT_KEY_TAKEAWAY = "Default key takeaway."
+
 @pytest.fixture
 def article_factory() -> Callable[..., Article]:
   # Factory for creating Article instances with sensible defaults.
   def _create_article(
-      title: str = "Default Paper",
-      url: str = "https://default-paper",
+      title: str = DEFAULT_ARTICLE_TITLE,
+      url: str = DEFAULT_ARTICLE_URL,
       doi: str | None = None,
-      abstract: str | None = "Default abstract.",
+      abstract: str | None = DEFAULT_ABSTRACT,
       authors: list[str] | None = None,
       keywords: list[str] | None = None,
       published_at=None,
@@ -69,8 +76,8 @@ def article_summary_factory(
   ) -> Callable[..., ArticleSummary]:
   # Factory for creating ArticleSummary instances.
   def _create_article_summary(
-    summary: str = "Default summary.",
-    key_takeaway: str = "Default key takeaway.",
+    summary: str = DEFAULT_SUMMARY,
+    key_takeaway: str = DEFAULT_KEY_TAKEAWAY,
     **ranked_article_kwargs,
   ) -> ArticleSummary:
 
@@ -91,8 +98,8 @@ def digest_factory(
   # Factory for creating Digest instances.
 
   def _create_digest(
-    generated_at=None,
-    articles=None,
+    generated_at: datetime | None = None,
+    articles: list[ArticleSummary] | None = None,
   ) -> Digest:
     
     return Digest(
@@ -125,3 +132,42 @@ Researchers developed an AI model that improves cancer detection accuracy.
 Key Takeaway:
 AI significantly improves diagnostic performance.
 """.strip()
+
+@pytest.fixture
+def fixed_datetime() -> datetime:
+  return datetime(
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0,
+    tzinfo=UTC,
+  )
+
+@pytest.fixture
+def invalid_llm_response() -> str:
+  return """
+Invalid response.
+No expected format.
+""".strip()
+
+@pytest.fixture
+def article_summaries(
+  article_summary_factory,
+) -> list[ArticleSummary]:
+  
+  return [
+    article_summary_factory(
+      summary="Summary 1",
+      key_takeaway="Takeaway 1",
+    ),
+      article_summary_factory(
+      summary="Summary 2",
+      key_takeaway="Takeaway 2",
+    ),
+      article_summary_factory(
+      summary="Summary 3",
+      key_takeaway="Takeaway 3",
+    ),
+  ]
