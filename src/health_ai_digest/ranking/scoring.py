@@ -18,7 +18,7 @@ class ScoringEngine:
 
     return RankedArticle(
       article=article,
-      score=final_score,
+      overall_score=final_score,
       relevance_score=relevance_score,
       recency_score=recency_score,
       quality_score=quality_score

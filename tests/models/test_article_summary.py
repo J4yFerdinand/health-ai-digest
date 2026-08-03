@@ -42,5 +42,5 @@ def test_article_preserves_ranked_article(article_summary_factory):
   assert article_summary.ranked_article.article.title == (
     "Machine Learning for Radiology"
   )
-  assert article_summary.ranked_article.score == 0.88
+  assert article_summary.ranked_article.overall_score == 0.88
   assert article_summary.ranked_article.recency_score == 1.0

@@ -19,7 +19,6 @@ class ArticleSummaryFormatter:
     Key Takeaway:
     <key takeaway>
     """
-
     response = response.strip()
 
     if not response:

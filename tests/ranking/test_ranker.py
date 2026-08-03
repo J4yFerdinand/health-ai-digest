@@ -28,8 +28,8 @@ def test_rank_returns_ranked_articles(mock_score):
   article2 = create_article("paper2")
 
   mock_score.side_effect = [
-    RankedArticle(article=article1, score=0.5),
-    RankedArticle(article=article2, score=0.8),
+    RankedArticle(article=article1, overall_score=0.5),
+    RankedArticle(article=article2, overall_score=0.8),
   ]
 
   result = Ranker.rank([article1, article2])
@@ -43,14 +43,14 @@ def test_rank_sorts_articles_by_score_desc(mock_score):
   article2 = create_article("paper2")
   article3 = create_article("paper3")
 
-  ranked1 = RankedArticle(article=article1, score=0.4)
-  ranked2 = RankedArticle(article=article2, score=0.95)
-  ranked3 = RankedArticle(article=article3, score=0.7)
+  ranked1 = RankedArticle(article=article1, overall_score=0.4)
+  ranked2 = RankedArticle(article=article2, overall_score=0.95)
+  ranked3 = RankedArticle(article=article3, overall_score=0.7)
 
   mock_score.side_effect = [ranked1, ranked2, ranked3]
 
   result = Ranker.rank([article1, article2, article3])
 
-  assert result[0].score == 0.95
-  assert result[1].score == 0.7
-  assert result[2].score == 0.4
+  assert result[0].overall_score == 0.95
+  assert result[1].overall_score == 0.7
+  assert result[2].overall_score == 0.4

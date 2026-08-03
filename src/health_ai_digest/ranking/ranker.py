@@ -23,7 +23,7 @@ class Ranker:
     ]
 
     ranked_articles.sort(
-      key=lambda ranked_article: ranked_article.score,
+      key=lambda ranked_article: ranked_article.overall_score,
       reverse=True
     )
 

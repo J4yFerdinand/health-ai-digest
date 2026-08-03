@@ -36,7 +36,7 @@ def test_score_computes_weighted_sum(mock_recency):
     + 0.0 * settings.ranking_quality_weight     # quality
   )
 
-  assert ranked.score == expected_score
+  assert ranked.overall_score == expected_score
   assert ranked.recency_score == 0.6
 
 @patch("health_ai_digest.ranking.scoring.SignalCalculator.recency_score")

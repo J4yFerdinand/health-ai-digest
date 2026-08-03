@@ -62,7 +62,7 @@ def ranked_article_factory(
 
     return RankedArticle(
       article=article,
-      score=score,
+      overall_score=score,
       relevance_score=relevance_score,
       recency_score=recency_score,
       quality_score=quality_score,

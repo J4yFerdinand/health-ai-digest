@@ -17,11 +17,11 @@ def test_ranked_article_creation():
 
   ranked = RankedArticle(
     article=article,
-    score=0.85,
+    overall_score=0.85,
   )
 
   assert ranked.article == article
-  assert ranked.score == 0.85
+  assert ranked.overall_score == 0.85
 
 def test_ranked_article_default_signal_scores():
   article = Article(
@@ -32,7 +32,7 @@ def test_ranked_article_default_signal_scores():
 
   ranked = RankedArticle(
     article=article,
-    score=0.7,
+    overall_score=0.7,
   )
 
   assert ranked.relevance_score == 0.0
@@ -49,5 +49,5 @@ def test_ranked_article_rejects_negative_score():
   with pytest.raises(ValidationError):
     RankedArticle(
       article=article,
-      score=-1.0
+      overall_score=-1.0
     )

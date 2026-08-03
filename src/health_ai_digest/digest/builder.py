@@ -69,13 +69,20 @@ Summary:
 Key Takeaway:
 """.strip()
 
-    raise NotImplementedError
+  def build_prompts(
+    self,
+    article: RankedArticle,
+  ) -> tuple[str, str]:
+    return (
+      self.build_system_prompt(),
+      self.build_user_prompt(article),
+    )
   
-  def build(self, article: RankedArticle) -> str:
+  def build(
+    self, 
+    article: RankedArticle
+  ) -> str:
     # Combine system and user prompts.
-    system = self.build_system_prompt()
-    user = self.build_user_prompt(article)
+    system, user = self.build_prompts(article)
 
     return f"{system}\n\n---\n\n{user}"
-
-    raise NotImplementedError
