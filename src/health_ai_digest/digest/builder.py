@@ -1,15 +1,18 @@
 from health_ai_digest.models import RankedArticle
 
+
 class PromptBuilder:
-  # Build prompts for AI summarization.
+    # Build prompts for AI summarization.
 
-  def build_system_prompt(self) -> str:
-    # Return the system prompt.
+    def build_system_prompt(self) -> str:
+        # Return the system prompt.
 
-    return """
-You are an expert medical research analyst specialized in Artificial Intelligence applied to Healthcare.
+        return """
+You are an expert medical research analyst specialized 
+in Artificial Intelligence applied to Healthcare.
 
-Your task is to summarize peer-reviewed healthcare AI research articles.
+Your task is to summarize peer-reviewed healthcare 
+AI research articles.
 
 Guidelines:
 
@@ -29,21 +32,21 @@ Summary:
 Key Takeaway:
 <single sentence>
 """.strip()
-  
-  def build_user_prompt(self, article: RankedArticle) -> str:
-    # Build the user prompt from a ranked article.
-    article = article.article
 
-    authors = ", ".join(article.authors) if article.authors else "Unknown"
-    keywords = ", ".join(article.keywords) if article.keywords else "None"
-    abstract = article.abstract or "No abstract available."
-    published = (
-      article.published_at.date().isoformat()
-      if article.published_at
-      else "Unknown"
-    )
+    def build_user_prompt(self, article: RankedArticle) -> str:
+        # Build the user prompt from a ranked article.
+        article = article.article
 
-    return f"""
+        authors = ", ".join(article.authors) if article.authors else "Unknown"
+        keywords = ", ".join(article.keywords) if article.keywords else "None"
+        abstract = article.abstract or "No abstract available."
+        published = (
+            article.published_at.date().isoformat()
+            if article.published_at
+            else "Unknown"
+        )
+
+        return f"""
 Title:
 {article.title}
 
@@ -69,20 +72,17 @@ Summary:
 Key Takeaway:
 """.strip()
 
-  def build_prompts(
-    self,
-    article: RankedArticle,
-  ) -> tuple[str, str]:
-    return (
-      self.build_system_prompt(),
-      self.build_user_prompt(article),
-    )
-  
-  def build(
-    self, 
-    article: RankedArticle
-  ) -> str:
-    # Combine system and user prompts.
-    system, user = self.build_prompts(article)
+    def build_prompts(
+        self,
+        article: RankedArticle,
+    ) -> tuple[str, str]:
+        return (
+            self.build_system_prompt(),
+            self.build_user_prompt(article),
+        )
 
-    return f"{system}\n\n---\n\n{user}"
+    def build(self, article: RankedArticle) -> str:
+        # Combine system and user prompts.
+        system, user = self.build_prompts(article)
+
+        return f"{system}\n\n---\n\n{user}"

@@ -3,3 +3,26 @@ name = "health-ai-digest"
 version = "0.1.0"
 description = "Personalized AI-powered newsletter for health research"
 requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+	"E",
+	"F",
+	"I",
+	"UP",
+	"B",	
+]
+
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.black]
+line-length = 88
+target_version = ["py313"]

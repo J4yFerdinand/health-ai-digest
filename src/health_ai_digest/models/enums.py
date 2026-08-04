@@ -1,6 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
-class SourceType(str, Enum):
-  PUBMED = 'pubmed'
-  ARXIV = 'arxiv'
-  RSS = 'rss'
+
+class SourceType(StrEnum):
+    PUBMED = "pubmed"
+    ARXIV = "arxiv"
+    RSS = "rss"

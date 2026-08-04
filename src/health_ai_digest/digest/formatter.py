@@ -1,57 +1,53 @@
 from health_ai_digest.models import ArticleSummary, RankedArticle
 
+
 class ArticleSummaryFormatter:
-  # Parse raw LLM responses into ArticleSummary models.
+    # Parse raw LLM responses into ArticleSummary models.
 
-  def parse(
-    self,
-    response: str,
-    ranked_article: RankedArticle,
-  ) -> ArticleSummary:
-    """
-    Convert a raw LLM response into an ArticleSummary.
+    def parse(
+        self,
+        response: str,
+        ranked_article: RankedArticle,
+    ) -> ArticleSummary:
+        """
+        Convert a raw LLM response into an ArticleSummary.
 
-    Expected format:
+        Expected format:
 
-    Summary:
-    <summary>
+        Summary:
+        <summary>
 
-    Key Takeaway:
-    <key takeaway>
-    """
-    response = response.strip()
+        Key Takeaway:
+        <key takeaway>
+        """
+        response = response.strip()
 
-    if not response:
-      raise ValueError("LLM response cannot be empty.")
-    
-    if "Summary:" not in response:
-      raise ValueError("Missing 'Summary:' section.")
-    
-    if "Key Takeaway:" not in response:
-      raise ValueError("Missing 'Key Takeaway:' section.")
-    
-    summary_part, key_takeaway_part = response.split(
-      "Key Takeaway:",
-      maxsplit=1,
-    )
+        if not response:
+            raise ValueError("LLM response cannot be empty.")
 
-    summary = (
-      summary_part
-      .replace("Summary:", "", 1)
-      .strip()
-    )
+        if "Summary:" not in response:
+            raise ValueError("Missing 'Summary:' section.")
 
-    key_takeaway = key_takeaway_part.strip()
+        if "Key Takeaway:" not in response:
+            raise ValueError("Missing 'Key Takeaway:' section.")
 
-    if not summary:
-      raise ValueError("Summary cannot be empty.")
-    
-    if not key_takeaway:
-      raise ValueError("Key takeaway cannot be empty.")
-    
-    return ArticleSummary(
-      ranked_article=ranked_article,
-      summary=summary,
-      key_takeaway=key_takeaway,
-    )
-  
+        summary_part, key_takeaway_part = response.split(
+            "Key Takeaway:",
+            maxsplit=1,
+        )
+
+        summary = summary_part.replace("Summary:", "", 1).strip()
+
+        key_takeaway = key_takeaway_part.strip()
+
+        if not summary:
+            raise ValueError("Summary cannot be empty.")
+
+        if not key_takeaway:
+            raise ValueError("Key takeaway cannot be empty.")
+
+        return ArticleSummary(
+            ranked_article=ranked_article,
+            summary=summary,
+            key_takeaway=key_takeaway,
+        )

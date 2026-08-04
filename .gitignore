@@ -8,7 +8,13 @@ __pycache__/
 # Testing
 .pytest_cache/
 .coverage
+coverage.xml
+coverage/
 htmlcov/
+
+# Quality reports
+reports/*
+!reports/.gitkeep
 
 # Environment variables
 .env

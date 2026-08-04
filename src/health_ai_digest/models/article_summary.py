@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 
-from health_ai_digest.models import RankedArticle
+from .ranked_article import RankedArticle
+
 
 class ArticleSummary(BaseModel):
-  ranked_article: RankedArticle
-  summary: str
-  key_takeaway: str
+    ranked_article: RankedArticle
+    summary: str
+    key_takeaway: str

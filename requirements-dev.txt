@@ -1,0 +1,13 @@
+-r requirements.txt
+
+# Linters
+ruff
+
+# Formatter
+black
+
+#Git hooks
+pre-commit
+
+# Testing
+pytest-cov
