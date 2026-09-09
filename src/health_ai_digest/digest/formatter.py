@@ -1,3 +1,5 @@
+import re
+
 from health_ai_digest.models import ArticleSummary, RankedArticle
 
 
@@ -31,10 +33,15 @@ class ArticleSummaryFormatter:
         if "Key Takeaway:" not in response:
             raise ValueError("Missing 'Key Takeaway:' section.")
 
-        summary_part, key_takeaway_part = response.split(
-            "Key Takeaway:",
-            maxsplit=1,
+        key_takeaway_match = re.search(
+            r"^[\t]*Key Takeaway:[ \t]*$", response, re.MULTILINE
         )
+
+        if key_takeaway_match is None:
+            raise ValueError("Missing 'Key Takeaway:' section.")
+
+        summary_part = response[: key_takeaway_match.start()]
+        key_takeaway_part = response[key_takeaway_match.end() :]
 
         summary = summary_part.replace("Summary:", "", 1).strip()
 
