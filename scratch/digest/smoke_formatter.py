@@ -431,6 +431,141 @@ def main() -> None:
     assert separator_summary_preserved
     assert separator_key_takeaway_preserved
 
+    # --------------------------------------------------------
+    # * Summary Marker Handling
+    # --------------------------------------------------------
+    print_section("\nSummary Marker Handling")
+
+    marker_summary = "The study defines Summary: as a useful reporting concept."
+
+    marker_key_takeaway = "Clear summaries can improve clinical communication."
+
+    marker_response = (
+        "Summary:\n" f"{marker_summary}\n\n" "Key Takeaway:\n" f"{marker_key_takeaway}"
+    )
+
+    marker_result = formatter.parse(
+        marker_response,
+        ranked_article,
+    )
+
+    marker_summary_preserved = marker_result.summary == marker_summary
+
+    marker_key_takeaway_preserved = marker_result.key_takeaway == marker_key_takeaway
+
+    print(f"Summary Internal Marker Preserved      : " f"{marker_summary_preserved}")
+    print(
+        f"Key Takeaway Correctly Extracted       : " f"{marker_key_takeaway_preserved}"
+    )
+
+    assert marker_summary_preserved
+    assert marker_key_takeaway_preserved
+
+    # --------------------------------------------------------
+    # * Separator Whitespace Handling
+    # --------------------------------------------------------
+    print_section("\nSeparator Whitespace Handling")
+
+    separator_whitespace_summary = (
+        "This study evaluates artificial intelligence " "for clinical decision support."
+    )
+
+    separator_whitespace_key_takeaway = (
+        "AI-assisted tools may support clinical decision-making."
+    )
+
+    separator_whitespace_response = (
+        "Summary:\n"
+        f"   {separator_whitespace_summary}   \n"
+        "Key Takeaway:\n"
+        f"   {separator_whitespace_key_takeaway}   \n"
+    )
+
+    separator_key_takeaway_whitespace_result = formatter.parse(
+        separator_whitespace_response,
+        ranked_article,
+    )
+
+    separator_whitespace_summary_preserved = (
+        separator_key_takeaway_whitespace_result.summary == separator_whitespace_summary
+    )
+
+    separator_whitespace_key_takeaway_preserved = (
+        separator_key_takeaway_whitespace_result.key_takeaway
+        == separator_whitespace_key_takeaway
+    )
+
+    print(
+        f"Summary Preserved                 : "
+        f"{separator_whitespace_summary_preserved}"
+    )
+    print(
+        f"Key Takeaway Preserved            : "
+        f"{separator_whitespace_key_takeaway_preserved}"
+    )
+
+    assert separator_whitespace_summary_preserved
+    assert separator_whitespace_key_takeaway_preserved
+
+    # --------------------------------------------------------
+    # * Case Handling
+    # --------------------------------------------------------
+    print_section("\nCase Handling")
+
+    case_summary = (
+        "This study evaluates artificial intelligence " "for clinical decision support."
+    )
+
+    case_key_takeaway = "AI-assisted tools may support clinical decision-making."
+
+    case_variations = [
+        (
+            "Uppercase",
+            "SUMMARY:",
+            "KEY TAKEAWAY:",
+        ),
+        (
+            "Lowercase",
+            "summary:",
+            "key takeaway:",
+        ),
+        (
+            "Mixed Case",
+            "SuMmArY:",
+            "KeY TaKeAwAy:",
+        ),
+    ]
+
+    for case_name, summary_marker, key_takeaway_marker in case_variations:
+        case_response = (
+            f"{summary_marker}\n"
+            f"{case_summary}\n\n"
+            f"{key_takeaway_marker}\n"
+            f"{case_key_takeaway}"
+        )
+
+        try:
+            case_result = formatter.parse(
+                case_response,
+                ranked_article,
+            )
+
+            case_summary_preserved = case_result.summary == case_summary
+
+            case_key_takeaway_preserved = case_result.key_takeaway == case_key_takeaway
+
+        except ValueError:
+            case_summary_preserved = False
+            case_key_takeaway_preserved = False
+
+        print(f"{case_name} Summary Preserved        : " f"{case_summary_preserved}")
+        print(
+            f"{case_name} Key Takeaway Preserved    : " f"{case_key_takeaway_preserved}"
+        )
+
+        assert case_summary_preserved
+        assert case_key_takeaway_preserved
+
     print_success()
 
 
